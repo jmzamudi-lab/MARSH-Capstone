@@ -1,0 +1,10 @@
+"0","mwq_dd_data <-
+  mwq_cleandata |> 
+  filter(Dawn_Dusk = ""Y"")
+"
+"1","[1m[33mError[39m in `filter()`:[22m
+[38;5;251m[33m![38;5;251m We detected a named input.
+[36mℹ[38;5;251m This usually means that you've used `=` instead of `==`.
+[36mℹ[38;5;251m Did you mean `Dawn_Dusk == ""Y""`?[39m
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"

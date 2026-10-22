@@ -1,0 +1,6 @@
+"0",""
+"0",""
+"0","ggplot(mwq_dd_data, aes(x = Date, y = Surface_temp, color = Sampling_location)) +"
+"0","  geom_point() +"
+"0","  labs(title = ""Time Plot of All Variables Overlaid"", x = ""Date"", y = ""Value"") +"
+"0","  theme_minimal()"

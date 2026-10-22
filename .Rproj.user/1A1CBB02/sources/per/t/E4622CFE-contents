@@ -20,7 +20,9 @@ library(readxl)
 mwq_data_2020_current <- read_excel("Marsh Water Quality Master Data 2020-current.xlsx",
                               sheet = "ALL", skip=1, na="NA")
 
-View(mwq_data_2020_current)
+
+
+view(mwq_data_2020_current)
 names(mwq_data_2020_current)
 
 #must explore data further, sheet put in a Pond 5 result although I don't think Pond 5 was sampled, also 'intake' and 'sd creek' readings that I don't see on raw data, also do the dates match up??? must double check
@@ -59,6 +61,9 @@ mwq_data_2020_current<-
           DO_deep = "mg/L...23",
           Notes = "anything that might affect water quality-inverts, algae, temp, weather, etc"
           )
+#fixing the time column since importing the file added a random date into the time column, making it time only
+mwq_data_2020_current$Time <- format(mwq_data_2020_current$Time, format = "%H:%M:%S")
+
 view(mwq_data_2020_current)
 ```
 
@@ -66,5 +71,79 @@ view(mwq_data_2020_current)
 
 ```{r}
 glimpse(mwq_data_2020_current)
+#mutating columns to be properly read as numeric or characters
+#need staff gauge,depth, surface temp, ec, tds, salinity,DO temp to be numeric
+mwq_data_2020_current |> 
+  mutate(Staff_Gauge_ft = as.numeric(Staff_Gauge_ft),
+         Depth_ft = as.numeric(Depth_ft),
+         Surface_temp = as.numeric(Surface_temp),
+         EC_surface = as.numeric(EC_surface),
+         TDS_surface = as.numeric(TDS_surface),
+         Salinity_surface = as.numeric(Salinity_surface),
+         DO_temp = as.numeric(DO_temp))
 
+
+
+```
+
+#### Selecting only relevant data
+
+```{r}
+
+#selecting only relevant columns, don't need any deep data since they only collected this data for a short period of time and then stopped taking it, they believed that the ponds at the SJM are not actually deep enough to have a significant difference in these measurements at the bottom of the ponds compared to the middle of the water column, drop pH since unreliable
+mwq_cleandata<-
+  mwq_data_2020_current |> 
+  select(Sampling_location, Date, Time, Collection_method, Dawn_Dusk, Weather, Tide, Staff_Gauge_ft, Depth_ft, Surface_temp, EC_surface, TDS_surface, Salinity_surface, Salinity_surface, Notes)
+
+#separate data by dawn dusk samples vs non dawn dusk samples, Julie said that the dawn dusk samples would show differences with non samples because temps would be lower since the samples were taken earlier in the day vs non samples that were mostly samples in the afternoon, Julie also wants to see if time/seasonality are factors
+
+#dis da dawn dusk data
+mwq_dd_data <-
+  mwq_cleandata |> 
+  filter(Dawn_Dusk == "Y")
+
+#dis da non dawn dusk data, wrote it this way because i thought there were NAs in this column but apparently not lol
+
+mwq_nondd_data<-
+  mwq_cleandata |> 
+  filter( ! Dawn_Dusk == "Y")
+
+#i think that depth and staff gauge needs to be changed so unit matches up, will worry about that later, depth may be a nothing burger 
+```
+
+#### Dawn/Dusk Data Cleaning
+
+```{r}
+mwq_dd_data
+#gotta rename the sampling locations, Hoag v Hoag pond
+mwq_dd_data<-
+mwq_dd_data |> 
+  mutate(Sampling_location = if_else(Hoag_Pond == "Hoag"))
+
+```
+
+#### Non-Dawn/Dusk Data Cleaning
+
+```{r}
+
+```
+
+### Data analyzing
+
+#### Dawn/Dusk Data
+
+```{r}
+mwq_dd_data
+
+
+ggplot(mwq_dd_data, aes(x = Date, y = Surface_temp, color = Sampling_location)) +
+  geom_point() +
+  labs(title = "Time Plot of All Variables Overlaid", x = "Date", y = "Value") +
+  theme_minimal()
+```
+
+#### Non-Dawn/Dusk Data
+
+```{r}
+mwq_nondd_data
 ```

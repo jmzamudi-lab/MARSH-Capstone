@@ -1,0 +1,11 @@
+"0","#gotta rename the sampling locations, Hoag v Hoag pond
+mwq_dd_data<-
+mwq_dd_data |> 
+  mutate(Sampling_location = if_else(Hoag_Pond == ""Hoag""))
+"
+"1","[1m[33mError[39m in `mutate()`:[22m
+[38;5;251m[36mℹ[38;5;251m In argument: `Sampling_location = if_else(Hoag_Pond == ""Hoag"")`.[39m
+[1mCaused by error:[22m
+[33m![39m object 'Hoag_Pond' not found
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"

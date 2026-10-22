@@ -26,3 +26,7 @@
 "0","          DO_deep = ""mg/L...23"","
 "0","          Notes = ""anything that might affect water quality-inverts, algae, temp, weather, etc"""
 "0","          )"
+"0",""
+"0","mwq_data_2020_current$Time <- format(mwq_data_2020_current$Time, format = ""%H:%M:%S"")"
+"0",""
+"0","view(mwq_data_2020_current)"
