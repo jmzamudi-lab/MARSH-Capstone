@@ -10,6 +10,7 @@ date: 10/20/2026
 ```{r}
 library(tidyverse)
 library(readxl)
+library(dplyr)
 ```
 
 ### File Upload: Marsh Water Quality Master Data 2020-current
@@ -82,8 +83,88 @@ mwq_data_2020_current |>
          Salinity_surface = as.numeric(Salinity_surface),
          DO_temp = as.numeric(DO_temp))
 
+#didn't really work so must continue
+#fixing the NA columns more
+mwq_data_2020_current <- mwq_data_2020_current |> 
+  mutate(across(c(Staff_Gauge_ft, Surface_temp,EC_surface,TDS_surface,pH, Salinity_surface), ~na_if(., "-")))
+```
+
+#### Fixing Columns 
+
+```{r}
+# Replace multiple different symbols/numbers with a single number
+# EXAMPLE: df$col_name[df$col_name %in% c(">", "<", "?", "N/A", -99)] <- 0
+
+#STAFF GAUGE COLUMNS
+
+# Replace a specific old value (number or symbol stored as character/factor) with a new number:
+
+#changing 2.5 n/a to just 2.5
+mwq_data_2020_current$Staff_Gauge_ft[mwq_data_2020_current$Staff_Gauge_ft == "2.5 n/a"] <- 2.5
+
+#change >4 and 4+ to 4.1???? yes or nah, must ask Julie?
+
+#changing >4 to 4.1 
+mwq_data_2020_current$Staff_Gauge_ft[mwq_data_2020_current$Staff_Gauge_ft == ">4"] <- 4.1
+
+#changing 4+ to 4.1 
+mwq_data_2020_current$Staff_Gauge_ft[mwq_data_2020_current$Staff_Gauge_ft == "4+"] <- 4.1
+
+#replacing the 'too dark's and blanks w/ NAs, keeping mid and low?
+mwq_data_2020_current$Staff_Gauge_ft[mwq_data_2020_current$Staff_Gauge_ft %in% c("too dark", "blank", "N/A")] <- NA
+#replacing the too dark to tell w/ NA
+mwq_data_2020_current$Staff_Gauge_ft[mwq_data_2020_current$Staff_Gauge_ft == '"too dark to tell"'] <- NA
+
+#SAMPLING LOCATION
+
+#need to drop row that says blah blah new YSI meter
+mwq_data_2020_current <- mwq_data_2020_current |> 
+  filter(Sampling_location != "All samples taken below this done with new YSI Meter")
+
+#we be keeping pH, its perfect, im perfect, dont need to change it
+#SURFACE TEMP, amazing, perfect
+
+#ELECTRIC CONDUCTIVITY (EC)
+
+#fixing the cells in μs/cm to mS, its a simple conversion so no biggie
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "4765 μs/cm"] <- 4.765
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "11767 μs/cm"] <- 11.767
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "29448 μs/cm"] <- 29.448
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "18191 μs/cm"] <- 18.191
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "1873 μs/cm"] <- 1.873
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "4378 μs/cm"] <- 4.378
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "7353 μs/cm"] <- 7.353
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "652 μs/cm"] <- 0.652
+mwq_data_2020_current$EC_surface[mwq_data_2020_current$EC_surface == "935 μs/cm"] <- 0.935
 
 
+#TOTAL DISSOLVED SOLIDS (TDS)
+
+#fixing the cells in g/L to ppt (parts per thousand), its a simple 1:1 conversion so no biggie
+mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "3.101 g/L"] <- 3.101
+mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "7.65 g/L"] <- 7.65 
+mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "19.14 g/L"] <- 19.14 
+mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "11.75 g/L"] <- 11.75 
+
+#SALINITY 
+
+#wtf does over mean? making it say NA
+mwq_data_2020_current$Salinity_surface[mwq_data_2020_current$Salinity_surface == "Over"] <- NA
+
+```
+
+##### Mutating columns again
+
+```{r}
+glimpse(mwq_data_2020_current)
+
+mwq_data_2020_current |> 
+  mutate(Staff_Gauge_ft = as.numeric(Staff_Gauge_ft),
+         Surface_temp = as.numeric(Surface_temp),
+         EC_surface = as.numeric(EC_surface),
+         TDS_surface = as.numeric(TDS_surface),
+         Salinity_surface = as.numeric(Salinity_surface),
+         pH = as.numeric(pH))
 ```
 
 #### Selecting only relevant data
@@ -93,7 +174,10 @@ mwq_data_2020_current |>
 #selecting only relevant columns, don't need any deep data since they only collected this data for a short period of time and then stopped taking it, they believed that the ponds at the SJM are not actually deep enough to have a significant difference in these measurements at the bottom of the ponds compared to the middle of the water column, drop pH since unreliable
 mwq_cleandata<-
   mwq_data_2020_current |> 
-  select(Sampling_location, Date, Time, Collection_method, Dawn_Dusk, Weather, Tide, Staff_Gauge_ft, Depth_ft, Surface_temp, EC_surface, TDS_surface, Salinity_surface, Salinity_surface, Notes)
+  select(Sampling_location, Date, Time, Collection_method, Dawn_Dusk, Weather, Tide, Staff_Gauge_ft, Surface_temp, EC_surface, TDS_surface, Salinity_surface, pH, Notes)
+
+#more data cleaning
+glimpse(mwq_cleandata)
 
 #separate data by dawn dusk samples vs non dawn dusk samples, Julie said that the dawn dusk samples would show differences with non samples because temps would be lower since the samples were taken earlier in the day vs non samples that were mostly samples in the afternoon, Julie also wants to see if time/seasonality are factors
 
