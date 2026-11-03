@@ -89,7 +89,7 @@ mwq_data_2020_current <- mwq_data_2020_current |>
   mutate(across(c(Staff_Gauge_ft, Surface_temp,EC_surface,TDS_surface,pH, Salinity_surface), ~na_if(., "-")))
 ```
 
-#### Fixing Columns 
+#### Fixing Columns
 
 ```{r}
 # Replace multiple different symbols/numbers with a single number
@@ -151,6 +151,7 @@ mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "11.75 g/
 #wtf does over mean? making it say NA
 mwq_data_2020_current$Salinity_surface[mwq_data_2020_current$Salinity_surface == "Over"] <- NA
 
+#gotta have NS be read as NA,fix mid to low, 
 ```
 
 ##### Mutating columns again
