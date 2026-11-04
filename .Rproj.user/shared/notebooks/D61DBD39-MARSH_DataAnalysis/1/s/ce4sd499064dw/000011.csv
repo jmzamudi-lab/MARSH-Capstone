@@ -1,5 +1,0 @@
-"0",""
-"0","#didn't really work so must continue"
-"0","#fixing the NA columns more"
-"0","mwq_data_2020_current <- mwq_data_2020_current |> "
-"0","  mutate(across(c(Staff_Gauge_ft, Surface_temp,EC_surface,TDS_surface,pH, Salinity_surface), ~na_if(., ""-"")))"

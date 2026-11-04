@@ -1,0 +1,59 @@
+"0","#Pond 11, take avgs of all samples taken on same date "
+"0","#EC SURFACE "
+"0","#pond11_avgEC<-"
+"0","#mwq_cleandata |> "
+"0"," # filter(""Pond 11"") |> "
+"0"," # group_by(Date) |> "
+"0","#  summarise( mean_EC = mean(EC_surface))"
+"0",""
+"0","dailyavg_summary <- "
+"0","  mwq_cleandata |> "
+"0","  group_by(Sampling_location, Date) |> "
+"0","  summarise("
+"0","    dailyavg_EC = mean(EC_surface, na.rm = TRUE),"
+"0","    dailyavg_TDS = mean(TDS_surface, na.rm = TRUE),"
+"0","    dailyavg_TDS = mean(TDS_surface, na.rm = TRUE),"
+"0","    dailyavg_temp = mean(Surface_temp, na.rm = TRUE),"
+"0","    dailyavg_salinity = mean(Salinity_surface, na.rm = TRUE),"
+"0","    dailyavg_pH = mean(pH, na.rm = TRUE))"
+"0",""
+"0","# Step 3: Group by location to get the overall average per day/location"
+"0","#avgEC_location <- avgEC |> "
+"0","  #group_by(Sampling_location)|> "
+"0","  #summarise(avgEC_per_day = mean(dailyavg_EC, na.rm = TRUE))"
+"0",""
+"0","print(dailyavg_summary)"
+"1","[38;5;246m# A tibble: 175 × 7[39m
+"
+"1","[38;5;246m# Groups:   Sampling_location [22][39m
+"
+"1","   Sampling_location Date                dailyavg_EC dailyavg_TDS dailyavg_temp dailyavg_salinity
+"
+"1","   [3m[38;5;246m<chr>[39m[23m             [3m[38;5;246m<dttm>[39m[23m                    [3m[38;5;246m<dbl>[39m[23m        [3m[38;5;246m<dbl>[39m[23m         [3m[38;5;246m<dbl>[39m[23m             [3m[38;5;246m<dbl>[39m[23m
+"
+"1","[38;5;250m 1[39m Hoag Pond         2020-06-24 [38;5;246m00:00:00[39m      [31mNaN[39m          [31mNaN[39m            22.6             [31mNaN[39m   
+"
+"1","[38;5;250m 2[39m Hoag Pond         2020-06-25 [38;5;246m00:00:00[39m       10.4          4.18         21               [31mNaN[39m   
+"
+"1","[38;5;250m 3[39m Hoag Pond         2022-02-18 [38;5;246m00:00:00[39m      [31mNaN[39m          [31mNaN[39m             9.05            [31mNaN[39m   
+"
+"1","[38;5;250m 4[39m Hoag Pond         2022-02-19 [38;5;246m00:00:00[39m      [31mNaN[39m          [31mNaN[39m             8.1             [31mNaN[39m   
+"
+"1","[38;5;250m 5[39m Hoag Pond         2022-11-30 [38;5;246m00:00:00[39m      [31mNaN[39m          [31mNaN[39m           [31mNaN[39m               [31mNaN[39m   
+"
+"1","[38;5;250m 6[39m Hoag Pond         2025-02-27 [38;5;246m00:00:00[39m        3.15         2.05         14.7               1.09
+"
+"1","[38;5;250m 7[39m Hoag Pond         2025-03-19 [38;5;246m00:00:00[39m        5.63         3.67         15.3               3.82
+"
+"1","[38;5;250m 8[39m Hoag Pond         2025-03-20 [38;5;246m00:00:00[39m        3.47         3.56         13.9               3.83
+"
+"1","[38;5;250m 9[39m Hoag Pond         2025-05-20 [38;5;246m00:00:00[39m       10.2          6.63         20.8             [31mNaN[39m   
+"
+"1","[38;5;250m10[39m Hoag Pond         2025-05-21 [38;5;246m00:00:00[39m       10.6          6.90         22.6             [31mNaN[39m   
+"
+"1","[38;5;246m# ℹ 165 more rows[39m
+"
+"1","[38;5;246m# ℹ 1 more variable: dailyavg_pH <dbl>[39m
+"
+"1","[38;5;246m# ℹ Use `print(n = ...)` to see more rows[39m
+"
