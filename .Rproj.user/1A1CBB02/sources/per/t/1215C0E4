@@ -8,7 +8,7 @@
     "dirty": false,
     "created": 1793733011792.0,
     "source_on_save": false,
-    "relative_order": 5,
+    "relative_order": 7,
     "properties": {
         "expression": "dailyavg_summary",
         "caption": "dailyavg_summary",

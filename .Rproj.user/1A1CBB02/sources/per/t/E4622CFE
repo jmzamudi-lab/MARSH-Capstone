@@ -3,7 +3,7 @@
     "path": "C:/Users/jmzamudi/Desktop/Github-zam/MARSH-Capstone/MARSH_DataAnalysis.qmd",
     "project_path": "MARSH_DataAnalysis.qmd",
     "type": "quarto_markdown",
-    "hash": "4030152632",
+    "hash": "3549996042",
     "contents": "",
     "dirty": false,
     "created": 1792517627430.0,
@@ -12,20 +12,20 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "226,0",
+        "cursorPosition": "511,0",
         "scrollLine": "0",
         "rmdVisualMode": "true",
         "rmdVisualWrapConfigured": "true",
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
-        "rmdVisualModeLocation": "8017:5115"
+        "rmdVisualModeLocation": "15508:20361"
     },
     "folds": "",
-    "lastKnownWriteTime": 1793735016,
+    "lastKnownWriteTime": 1793908171,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1793735016562,
+    "last_content_update": 1793908171283,
     "read_only": false,
     "read_only_alternatives": []
 }

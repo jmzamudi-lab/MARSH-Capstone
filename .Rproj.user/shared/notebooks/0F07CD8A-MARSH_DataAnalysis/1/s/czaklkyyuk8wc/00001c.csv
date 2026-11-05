@@ -1,0 +1,4 @@
+"0","ggplot(dd_seasonalavg_all, aes(x = year, y = dd_savg_EC, fill= sampling_location)) +"
+"0","  geom_col()+"
+"0","  facet_wrap(~season)"
+"0",""

@@ -326,6 +326,8 @@ EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
 plot(EC_dd_avgs)
 ```
 
+Salinity Graph
+
 ```{r}
 sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
   geom_smooth(
@@ -336,8 +338,8 @@ sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
   ) +
   labs(
     x = "Date",                            
-    y = "Conductivity mS",
-    title = "Average Salinity Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
+    y = "Salinity ppt",
+    title = "Average Salinity  of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
   ) +
   scale_x_date(
     date_labels = "%Y",            
@@ -357,12 +359,162 @@ sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
 print(sal_dd_avgs)
 ```
 
+Seasonal Averages of only ponds that have most data
+
+```{r}
+#Adding a 'season' column based on month
+dd_seasons <- 
+  dd_dayavg_all |> 
+  mutate(
+    month = month(date),
+    season = case_when(
+      month %in% c(12, 1, 2) ~ "Winter",
+      month %in% c(3, 4, 5)  ~ "Spring",
+      month %in% c(6, 7, 8)  ~ "Summer",
+      month %in% c(9, 10, 11) ~ "Fall"
+    ),
+    year = year(date)
+  )
+
+#Calculate the average per season
+dd_seasonalavg_all <- 
+  dd_seasons |> 
+  group_by(sampling_location,year, season) |> 
+  summarise(
+    dd_savg_EC = mean(dd_dayavg_EC, na.rm = TRUE),
+    dd_savg_TDS = mean(dd_dayavg_TDS, na.rm = TRUE),
+    dd_savg_temp = mean(dd_dayavg_temp, na.rm = TRUE),
+    dd_savg_salinity = mean(dd_dayavg_salinity, na.rm = TRUE),
+    dd_savg_pH = mean(dd_dayavg_pH, na.rm = TRUE),
+    .groups = "drop")
+#why am I still getting two middle marshes 
+
+```
+
+Graphing seasonal avgs
+
+```{r}
+# Combine season and year with a space separator
+dd_syearavg_all <- 
+  dd_seasonalavg_all |> 
+  unite(col = "season_year", season, year, sep = " ")
+
+# Plot scatter points and a line graph faceted by year
+ggplot(dd_syearavg_all, aes(x = season_year, y = dd_savg_EC)) +
+  geom_point(color = "blue", alpha = 0.6) +   # Adds the scatter plot
+  geom_line(color = "darkred", size = 1) +     # Adds the line graph
+  labs(
+    title = "Marsh EC over time",
+    x = "Season and Year",
+    y = "EC"
+  ) +
+  theme_minimal()+
+  facet_wrap(~sampling_location)
+
+#horrible graph, actually awful
+
+#bar graph?
+ggplot(dd_syearavg_all, aes(x = season_year, y = dd_savg_EC)) +
+  geom_col( color = "darkgray", linewidth = 1)+
+  facet_wrap(~sampling_location)
+
+```
+
+Time Series of seasonal avg
+
+EC
+
+```{r}
+#EC
+EC_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
+  geom_smooth(
+    aes(y = dd_savg_EC, color = sampling_location),
+    method = "loess",
+    size = 0.5,
+    alpha = 0.8,
+    se = FALSE
+  ) +
+  labs(
+    x = "Year",
+    y = "Conductivity mS",
+    title = "Average Yearly Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
+  ) +
+  facet_wrap(~season)
+  #getting closer but i still hate it
+plot(EC_dd_savgs)
+
+```
+
+TDS
+
+```{r}
+TDS_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
+  geom_smooth(
+    aes(y = dd_savg_TDS, color = sampling_location),
+    method = "loess",
+    size = 0.5,
+    alpha = 0.8,
+    se = FALSE
+  ) +
+  labs(
+    x = "Year",
+    y = "Total Dissolved Solids",
+    title = "Average TDS of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh by year and season"
+  ) +
+  facet_wrap(~season)
+#getting closer but i still hate it
+plot(TDS_dd_savgs)
+```
+
+changing it to the other facet wrapping
+
+```{r}
+# Plot scatter points and a line graph faceted by year
+ggplot(dd_seasonalavg_all, aes(x = year, y = dd_savg_EC, color = sampling_location)) +
+  geom_line() +     # Adds the line graph
+  labs(
+    title = "Marsh EC over time",
+    x = "Season and Year",
+    y = "EC"
+  ) +
+  theme_minimal()+
+  facet_wrap(~season)
+
+#booty butt cheeks
+```
+
+```{r}
+ggplot(dd_seasonalavg_all, aes(x = year, y = dd_savg_EC, fill= sampling_location)) +
+  geom_col()+
+  facet_wrap(~season)
+
+```
+
+trying out new graph
+
+```{r}
+#summary table for EC 
+pond_summary <- water_data |> 
+  group_by(pond_id) %>%
+  summarize(
+    mean_ec = mean(conductivity, na.rm = TRUE),
+    sd_ec = sd(conductivity, na.rm = TRUE),
+    median_ec = median(conductivity, na.rm = TRUE),
+    iqr_ec = IQR(conductivity, na.rm = TRUE),
+    n_samples = n()
+  )
+
+print(pond_summary)
+```
+
 #### Non-Dawn/Dusk Data
 
 ```{r}
 mwq_nondd_data
 ```
 
-geom smooth for time series
+geom line not smooth bc amy said so for time series
 
 staff levels against salinity and other metrics
+
+average per season and year
