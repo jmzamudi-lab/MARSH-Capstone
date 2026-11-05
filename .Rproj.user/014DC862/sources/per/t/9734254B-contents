@@ -87,7 +87,7 @@ mwq_data_2020_current <- mwq_data_2020_current |>
          salinity_surface = na_if(salinity_surface, "NS"))
 ```
 
-#### Fixing values and remaining NAs 
+#### Fixing values and remaining NAs
 
 ```{r}
 # Replace multiple different symbols/numbers with a single number
@@ -239,19 +239,20 @@ mwq_nondd_data<-
 
 ### Data analysis
 
-#### Dawn/Dusk Averages
+#### Dawn/Dusk Averages per day sampled
 
 ```{r}
-#calculating day avgs of response variables of interest
+#calculating day avgs of response variables of interest, fixed it from before
 dd_dayavg_all <- 
   mwq_dd_data |> 
-    group_by(sampling_location, datetime) |> 
+    group_by(sampling_location, date = as.Date(datetime)) |> 
       summarise(
         dd_dayavg_EC = mean(EC_surface, na.rm = TRUE),
         dd_dayavg_TDS = mean(TDS_surface, na.rm = TRUE),
         dd_dayavg_temp = mean(surface_temp, na.rm = TRUE),
         dd_dayavg_salinity = mean(salinity_surface, na.rm = TRUE),
-        dd_dayavg_pH = mean(pH, na.rm = TRUE))
+        dd_dayavg_pH = mean(pH, na.rm = TRUE),
+        .groups = "drop")
 
 
 
@@ -259,44 +260,45 @@ dd_dayavg_all <-
 
 #### Exploratory Graphs
 
+Avgs per year?
+
 ```{r}
-#idk what this is i cannot
-EC_col<-
-  ggplot(dd_dayavg_all, aes(x = datetime)) +
-  geom_bar(    
-    aes(y = dd_dayavg_EC) 
-    ) +
-    labs(
-    x = "Date",                            
-    y = "Conductivity mS",
-    title = "Average Yearly Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
+
+# pond 8 bar graph to visualize avgs over years
+
+#pond8_dd_avg_all <- 
+  #dd_dayavg_all |> 
+   # filter(sampling_location == "Pond 8")
+
+# Plot scatter points and a line graph faceted by year
+ggplot(dd_dayavg_all, aes(x = date, y = dd_dayavg_EC)) +
+  geom_point(color = "blue", alpha = 0.6) +   # Adds the scatter plot
+  geom_line(color = "darkred", size = 1) +     # Adds the line graph
+  labs(
+    title = "Marsh EC over time",
+    x = "Date",
+    y = "EC"
   ) +
-  scale_x_date(
-    date_labels = "%y",            
-    date_breaks = "1 year",
-    expand = c(0, 0)
-  ) +
-  theme_bw() +
-  theme(
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5),
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.title.y = element_text(size = 10.5),
-    text = element_text(family = "Helvetica")
-  ) +
-  facet_wrap(~sampling_location)
-plot(EC_col)
+  theme_minimal()+
+facet_wrap(~sampling_location)
+
+                    #horrible graph, actually awful
+
+#bar graph?
+ggplot(dd_dayavg_all, aes(x = date, y = dd_dayavg_EC)) +
+  geom_col( color = "darkgray", linewidth = 1)+
+facet_wrap(~sampling_location)
+
+        #okay i see that there needs to be a curved line maybe, could do a geom col with, also i need to label season to it, could do the averages of the month, also possibly year too
 ```
 
-### Data analyzing
-
-#### Time Series 
+#### Time Series
 
 ```{r}
-EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = datetime)) +
-  geom_point(
+EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
+  geom_smooth(
     aes(y = dd_dayavg_EC),
+    method = "loess",
     linewidth = 0.5,
     alpha = 0.8
   ) +
@@ -306,7 +308,7 @@ EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = datetime)) +
     title = "Average Yearly Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
   ) +
   scale_x_date(
-    date_labels = "%y",            
+    date_labels = "%Y",            
     date_breaks = "1 year",
     expand = c(0, 0)
   ) +
@@ -320,8 +322,39 @@ EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = datetime)) +
     text = element_text(family = "Helvetica")
   ) +
   facet_wrap(~sampling_location)
-
+      #this does not look right ??? looking at salinity next
 plot(EC_dd_avgs)
+```
+
+```{r}
+sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
+  geom_smooth(
+    aes(y = dd_dayavg_salinity),
+    method = "loess",
+    linewidth = 0.5,
+    alpha = 0.8
+  ) +
+  labs(
+    x = "Date",                            
+    y = "Conductivity mS",
+    title = "Average Salinity Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
+  ) +
+  scale_x_date(
+    date_labels = "%Y",            
+    date_breaks = "1 year",
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title.y = element_text(size = 10.5),
+    text = element_text(family = "Helvetica")
+  ) +
+  facet_wrap(~sampling_location)
+print(sal_dd_avgs)
 ```
 
 #### Non-Dawn/Dusk Data
@@ -331,3 +364,5 @@ mwq_nondd_data
 ```
 
 geom smooth for time series
+
+staff levels against salinity and other metrics
