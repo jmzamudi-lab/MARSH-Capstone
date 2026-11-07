@@ -171,23 +171,32 @@ mwq_cleandata<-
 
 mwq_cleaner_data<-
   mwq_cleandata |> 
-  select(sampling_location, datetime, collection_method, dawn_dusk, weather, tide, staff_gauge_ft, surface_temp, EC_surface, TDS_surface, salinity_surface, pH, notes)
+  select(sampling_location, datetime, collection_method, dawn_dusk, weather, tide, staff_gauge_ft, surface_temp, EC_surface, TDS_surface, salinity_surface, pH, notes, DO_surface)
 
 #making sure its all being read correctly 
 mwq_cleaner_data<-
   mwq_cleaner_data |> 
     mutate(staff_gauge_ft = as.numeric(staff_gauge_ft),
          surface_temp = as.numeric(surface_temp),
+         DO_surface= as.numeric(DO_surface),
          EC_surface = as.numeric(EC_surface),
          TDS_surface = as.numeric(TDS_surface),
          salinity_surface = as.numeric(salinity_surface),
-         pH = as.numeric(pH))
+         pH = as.numeric(pH)
+         )
 
 
 
 mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag"] <- "Hoag Pond"
 
 mwq_cleaner_data
+
+# 1. Install and load the package (only need to install once)
+library(writexl)
+
+# 2. Export your dataset
+# Replace 'my_data' with your dataframe, and name your file
+write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
 ```
 
 #### Summarizing Data: Average per sample day per pond
@@ -252,10 +261,11 @@ dd_dayavg_all <-
         dd_dayavg_temp = mean(surface_temp, na.rm = TRUE),
         dd_dayavg_salinity = mean(salinity_surface, na.rm = TRUE),
         dd_dayavg_pH = mean(pH, na.rm = TRUE),
+        dd_dayavg_DO = mean(DO_surface, na.rm = TRUE),
         .groups = "drop")
 
 
-
+write_xlsx(dd_dayavg_all, "dd_dayavg_all.xlsx")
 ```
 
 #### Exploratory Graphs
@@ -386,8 +396,10 @@ dd_seasonalavg_all <-
     dd_savg_temp = mean(dd_dayavg_temp, na.rm = TRUE),
     dd_savg_salinity = mean(dd_dayavg_salinity, na.rm = TRUE),
     dd_savg_pH = mean(dd_dayavg_pH, na.rm = TRUE),
+    dd_savg_DO = mean(dd_dayavg_DO, na.rm = TRUE),
     .groups = "drop")
 #why am I still getting two middle marshes 
+write_xlsx(dd_seasonalavg_all, "dd_seasonalavg_all.xlsx")
 
 ```
 
@@ -505,6 +517,25 @@ pond_summary <- water_data |>
   )
 
 print(pond_summary)
+```
+
+```{r}
+DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
+  geom_line(
+    aes(y = dd_savg_DO, color = sampling_location),
+    method = "loess",
+    size = 0.5,
+    alpha = 0.8,
+    se = FALSE
+  ) +
+  labs(
+    x = "Year",
+    y = "Dissolved Oxygen mg/L",
+    title = "Average DO of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh by year and season"
+  ) +
+  facet_wrap(~season)
+#getting closer but i still hate it
+plot(DO_dd_savgs)
 ```
 
 #### Non-Dawn/Dusk Data
