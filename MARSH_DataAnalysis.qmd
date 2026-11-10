@@ -155,6 +155,7 @@ mwq_data_2020_current$TDS_surface[mwq_data_2020_current$TDS_surface == "11.75 g/
 mwq_data_2020_current$salinity_surface[mwq_data_2020_current$salinity_surface == "Over"] <- NA
 
 
+
 ```
 
 #### Selecting relevant data and mutating columns
@@ -185,18 +186,30 @@ mwq_cleaner_data<-
          pH = as.numeric(pH)
          )
 
+#sampling location
+mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle Marsh"] <- "mid_marsh"
+mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle marsh"] <- "mid_marsh"
+mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle Marsh "] <- "mid_marsh"
 
-
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag"] <- "Hoag Pond"
+mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Upper SD creek"] <- "mid_marsh"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag"] <- "hoag_pond"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag Pond"] <- "hoag_pond"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Upper marsh"] <- "upper_marsh"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Upper Marsh"] <- "upper_marsh"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 11"] <- "pond_11"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 3"] <- "pond_3"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 5"] <- "pond_5"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 8"] <- "pond_8"
+mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 10"] <- "pond_10"
 
 mwq_cleaner_data
 
 # 1. Install and load the package (only need to install once)
-library(writexl)
+#library(writexl)
 
 # 2. Export your dataset
 # Replace 'my_data' with your dataframe, and name your file
-write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
+#write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
 ```
 
 #### Summarizing Data: Average per sample day per pond

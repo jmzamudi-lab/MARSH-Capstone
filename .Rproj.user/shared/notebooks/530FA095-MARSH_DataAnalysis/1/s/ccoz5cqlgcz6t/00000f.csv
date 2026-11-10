@@ -1,0 +1,12 @@
+"0","#summary table for EC "
+"0","pond_summary <- water_data |> "
+"0","  group_by(pond_id) %>%"
+"0","  summarize("
+"0","    mean_ec = mean(conductivity, na.rm = TRUE),"
+"0","    sd_ec = sd(conductivity, na.rm = TRUE),"
+"0","    median_ec = median(conductivity, na.rm = TRUE),"
+"0","    iqr_ec = IQR(conductivity, na.rm = TRUE),"
+"0","    n_samples = n()"
+"0","  )"
+"2","Error: object 'water_data' not found
+"
