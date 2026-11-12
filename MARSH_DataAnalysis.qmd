@@ -8,6 +8,7 @@ date: 10/20/2026
 ### Install Packages/Library Packages
 
 ```{r}
+library(stringr)
 library(tidyverse)
 library(readxl)
 library(dplyr)
@@ -162,6 +163,43 @@ mwq_data_2020_current$salinity_surface[mwq_data_2020_current$salinity_surface ==
 
 ```{r}
 
+mwq_data_2020_current<-
+mwq_data_2020_current |> 
+  mutate(
+    sampling_location = case_match(
+      sampling_location,
+      "Middle Marsh" ~ "mid_marsh",
+      "Middle marsh" ~ "mid_marsh",
+      "Middle Marsh\n" ~ "mid_marsh",
+      "Hoag" ~ "hoag_pond",
+      "Hoag Pond" ~ "hoag_pond",
+      "Upper marsh" ~ "upper_marsh",
+      "Upper Marsh" ~ "upper_marsh",
+      "Pond 10" ~ "pond_10",
+      "Pond 11" ~ "pond_11",
+      "pond 11" ~ "pond_11",
+      "Pond 5" ~ "pond_5",
+      "Pond 3" ~ "pond_3",
+      "Pond 8" ~ "pond_8",
+      "Intake at Campus Dr" ~ "intake_campus_dr",
+      "Lower marsh" ~ "lower_marsh",
+      "Lower Marsh" ~ "lower_marsh",
+      "Lower Marsh\n" ~ "lower_marsh",
+      "Upper SD creek" ~ "upper_SDC",
+      "Lower SD creek" ~ "low_SDC",
+      "Middle SD creek" ~ "mid_SDC",
+      "Middle SD creek\n" ~ "mid_SDC",
+      "Intake" ~ "intake_SDC",
+      "SDC Intake" ~ "intake_SDC",
+      .default = sampling_location))
+
+mwq_data_2020_current |>
+  count(sampling_location) |>
+  print(n = Inf)
+
+unique(mwq_data_2020_current$sampling_location)
+
+
 #combine date and time columns?
 mwq_cleandata<-
   mwq_data_2020_current |> 
@@ -187,20 +225,6 @@ mwq_cleaner_data<-
          )
 
 #sampling location
-mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle Marsh"] <- "mid_marsh"
-mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle marsh"] <- "mid_marsh"
-mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Middle Marsh "] <- "mid_marsh"
-
-mwq_cleaner_data$sampling_location[mwq_data_2020_current$sampling_location == "Upper SD creek"] <- "mid_marsh"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag"] <- "hoag_pond"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Hoag Pond"] <- "hoag_pond"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Upper marsh"] <- "upper_marsh"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Upper Marsh"] <- "upper_marsh"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 11"] <- "pond_11"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 3"] <- "pond_3"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 5"] <- "pond_5"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 8"] <- "pond_8"
-mwq_cleaner_data$sampling_location[mwq_cleaner_data$sampling_location == "Pond 10"] <- "pond_10"
 
 mwq_cleaner_data
 
@@ -215,31 +239,7 @@ mwq_cleaner_data
 #### Summarizing Data: Average per sample day per pond
 
 ```{r}
-#Pond 11, take avgs of all samples taken on same date 
-#EC SURFACE 
-#pond11_avgEC<-
-#mwq_cleandata |> 
- # filter("Pond 11") |> 
- # group_by(Date) |> 
-#  summarise( mean_EC = mean(EC_surface))
 
-#dailyavg_summary <- 
- # mwq_cleandata |> 
- # group_by(Sampling_location, Date) |> 
-#  summarise(
- #   dailyavg_EC = mean(EC_surface, na.rm = TRUE),
-  #  dailyavg_TDS = mean(TDS_surface, na.rm = TRUE),
-   # dailyavg_TDS = mean(TDS_surface, na.rm = TRUE),
-    #dailyavg_temp = mean(Surface_temp, na.rm = TRUE),
-    #dailyavg_salinity = mean(Salinity_surface, na.rm = TRUE),
-    #dailyavg_pH = mean(pH, na.rm = TRUE))
-
-# Step 3: Group by location to get the overall average per day/location
-#avgEC_location <- avgEC |> 
-  #group_by(Sampling_location)|> 
-  #summarise(avgEC_per_day = mean(dailyavg_EC, na.rm = TRUE))
-
-#print(dailyavg_summary)
 ```
 
 ### Filtering Dawn/Dusk Data
@@ -261,25 +261,64 @@ mwq_nondd_data<-
 
 ### Data analysis
 
-#### Dawn/Dusk Averages per day sampled
+#### Dawn/Dusk Averages per 2 days sampled
 
 ```{r}
-#calculating day avgs of response variables of interest, fixed it from before
-dd_dayavg_all <- 
+#create date pairings, some do no ot have a pair but I dont want to drop that data since it could be helpful later
+date_pairs<-
   mwq_dd_data |> 
-    group_by(sampling_location, date = as.Date(datetime)) |> 
-      summarise(
-        dd_dayavg_EC = mean(EC_surface, na.rm = TRUE),
-        dd_dayavg_TDS = mean(TDS_surface, na.rm = TRUE),
-        dd_dayavg_temp = mean(surface_temp, na.rm = TRUE),
-        dd_dayavg_salinity = mean(salinity_surface, na.rm = TRUE),
-        dd_dayavg_pH = mean(pH, na.rm = TRUE),
-        dd_dayavg_DO = mean(DO_surface, na.rm = TRUE),
-        .groups = "drop")
+  mutate(date=as.Date(datetime)) |> 
+  distinct(sampling_location, date) |> 
+  filter(!is.na(date)) |>
+  arrange(sampling_location, date) |> 
+  group_by(sampling_location) |> 
+  mutate( new_run = is.na(lag(date)) | (date - lag(date) != 1), run_id = cumsum(new_run) ) |> 
+  group_by(sampling_location, run_id) |> 
+  mutate(pair_in_run = (row_number() - 1) %/% 2 + 1) |> 
+  group_by(sampling_location) |> 
+  mutate( pairsamp_id = cumsum( row_number() == 1 | run_id != lag(run_id) | pair_in_run != lag(pair_in_run) ) ) |> 
+  ungroup() |> 
+  select(sampling_location, date, pairsamp_id)
 
+#averages of the two days sampled 
+dd_pairsamp_avg_all<-
+  mwq_dd_data |> 
+  mutate(date = as.Date(datetime)) |> 
+  filter(!is.na(date)) |> 
+  left_join( date_pairs, by = c("sampling_location", "date") ) |> 
+  group_by(sampling_location, pairsamp_id) |> 
+  summarise( 
+    start_date = min(date), 
+    end_date = max(date), 
+    n_days = n_distinct(date), 
+    mean_EC = mean(EC_surface, na.rm = TRUE), 
+    mean_TDS = mean(TDS_surface, na.rm = TRUE),
+    mean_temp = mean(surface_temp, na.rm = TRUE),
+    mean_salinity = mean(salinity_surface, na.rm = TRUE),
+    mean_pH = mean(pH, na.rm = TRUE),
+    mean_DO = mean(DO_surface, na.rm = TRUE),
+    .groups = "drop" ) |> 
+  mutate(
+  month = month(start_date),
+  season = case_when(
+    month %in% c(12, 1, 2) ~ "Winter",
+    month %in% c(3, 4, 5)  ~ "Spring",
+    month %in% c(6, 7, 8)  ~ "Summer",
+    month %in% c(9, 10, 11) ~ "Fall"),
+  year = year(start_date))
 
-write_xlsx(dd_dayavg_all, "dd_dayavg_all.xlsx")
+dd_pairsamp_avg_all
 ```
+
+Averages per year
+
+```{r}
+dd_pairsamp_avg_all |> 
+  
+
+```
+
+Averages per seasonal years??
 
 #### Exploratory Graphs
 
@@ -287,19 +326,13 @@ Avgs per year?
 
 ```{r}
 
-# pond 8 bar graph to visualize avgs over years
-
-#pond8_dd_avg_all <- 
-  #dd_dayavg_all |> 
-   # filter(sampling_location == "Pond 8")
-
 # Plot scatter points and a line graph faceted by year
-ggplot(dd_dayavg_all, aes(x = date, y = dd_dayavg_EC)) +
+ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +
   geom_point(color = "blue", alpha = 0.6) +   # Adds the scatter plot
   geom_line(color = "darkred", size = 1) +     # Adds the line graph
   labs(
     title = "Marsh EC over time",
-    x = "Date",
+    x = "Year",
     y = "EC"
   ) +
   theme_minimal()+
@@ -308,9 +341,9 @@ facet_wrap(~sampling_location)
                     #horrible graph, actually awful
 
 #bar graph?
-ggplot(dd_dayavg_all, aes(x = date, y = dd_dayavg_EC)) +
+ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +
   geom_col( color = "darkgray", linewidth = 1)+
-facet_wrap(~sampling_location)
+    facet_wrap(~sampling_location)
 
         #okay i see that there needs to be a curved line maybe, could do a geom col with, also i need to label season to it, could do the averages of the month, also possibly year too
 ```
@@ -318,9 +351,9 @@ facet_wrap(~sampling_location)
 #### Time Series
 
 ```{r}
-EC_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
+EC_dd_avgs <- ggplot(dd_pairsamp_avg_all, aes(x = start_date)) +
   geom_smooth(
-    aes(y = dd_dayavg_EC),
+    aes(y = mean_EC),
     method = "loess",
     linewidth = 0.5,
     alpha = 0.8
@@ -352,15 +385,15 @@ plot(EC_dd_avgs)
 Salinity Graph
 
 ```{r}
-sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
-  geom_smooth(
-    aes(y = dd_dayavg_salinity),
+sal_dd_avgs <- ggplot(dd_pairsamp_avg_all, aes(x = year)) +
+  geom_line(
+    aes(y = mean_salinity),
     method = "loess",
     linewidth = 0.5,
     alpha = 0.8
   ) +
   labs(
-    x = "Date",                            
+    x = "Year",                            
     y = "Salinity ppt",
     title = "Average Salinity  of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"
   ) +
@@ -379,40 +412,41 @@ sal_dd_avgs <- ggplot(dd_dayavg_all, aes(x = date)) +
     text = element_text(family = "Helvetica")
   ) +
   facet_wrap(~sampling_location)
+
 print(sal_dd_avgs)
 ```
 
-Seasonal Averages of only ponds that have most data
+Seasonal Averages
 
 ```{r}
-#Adding a 'season' column based on month
-dd_seasons <- 
-  dd_dayavg_all |> 
+pairsamp_dd_raw<-
+mwq_dd_data |> 
+  mutate(date = as.Date(datetime)) |> 
+  filter(!is.na(date)) |> 
+  left_join( date_pairs, by = c("sampling_location", "date") ) |> 
+  group_by(sampling_location, pairsamp_id) |> 
   mutate(
     month = month(date),
     season = case_when(
       month %in% c(12, 1, 2) ~ "Winter",
       month %in% c(3, 4, 5)  ~ "Spring",
       month %in% c(6, 7, 8)  ~ "Summer",
-      month %in% c(9, 10, 11) ~ "Fall"
-    ),
-    year = year(date)
-  )
+      month %in% c(9, 10, 11) ~ "Fall"),
+    year = year(date))
 
 #Calculate the average per season
 dd_seasonalavg_all <- 
-  dd_seasons |> 
+  pairsamp_dd_raw |> 
   group_by(sampling_location,year, season) |> 
   summarise(
-    dd_savg_EC = mean(dd_dayavg_EC, na.rm = TRUE),
-    dd_savg_TDS = mean(dd_dayavg_TDS, na.rm = TRUE),
-    dd_savg_temp = mean(dd_dayavg_temp, na.rm = TRUE),
-    dd_savg_salinity = mean(dd_dayavg_salinity, na.rm = TRUE),
-    dd_savg_pH = mean(dd_dayavg_pH, na.rm = TRUE),
-    dd_savg_DO = mean(dd_dayavg_DO, na.rm = TRUE),
-    .groups = "drop")
-#why am I still getting two middle marshes 
-write_xlsx(dd_seasonalavg_all, "dd_seasonalavg_all.xlsx")
+    seas_mean_EC = mean(EC_surface, na.rm = TRUE), 
+    seas_mean_TDS = mean(TDS_surface, na.rm = TRUE),
+    seas_mean_temp = mean(surface_temp, na.rm = TRUE),
+    seas_mean_salinity = mean(salinity_surface, na.rm = TRUE),
+    seas_mean_pH = mean(pH, na.rm = TRUE),
+    seas_mean_DO = mean(DO_surface, na.rm = TRUE),
+    .groups = "drop" )
+#write_xlsx(dd_seasonalavg_all, "dd_seasonalavg_all.xlsx")
 
 ```
 
@@ -425,7 +459,7 @@ dd_syearavg_all <-
   unite(col = "season_year", season, year, sep = " ")
 
 # Plot scatter points and a line graph faceted by year
-ggplot(dd_syearavg_all, aes(x = season_year, y = dd_savg_EC)) +
+ggplot(dd_syearavg_all, aes(x = season_year, y = seas_mean_EC)) +
   geom_point(color = "blue", alpha = 0.6) +   # Adds the scatter plot
   geom_line(color = "darkred", size = 1) +     # Adds the line graph
   labs(
@@ -439,7 +473,7 @@ ggplot(dd_syearavg_all, aes(x = season_year, y = dd_savg_EC)) +
 #horrible graph, actually awful
 
 #bar graph?
-ggplot(dd_syearavg_all, aes(x = season_year, y = dd_savg_EC)) +
+ggplot(dd_syearavg_all, aes(x = season_year, y = seas_mean_EC)) +
   geom_col( color = "darkgray", linewidth = 1)+
   facet_wrap(~sampling_location)
 
@@ -452,8 +486,8 @@ EC
 ```{r}
 #EC
 EC_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
-  geom_smooth(
-    aes(y = dd_savg_EC, color = sampling_location),
+  geom_line(
+    aes(y = seas_mean_EC, color = sampling_location),
     method = "loess",
     size = 0.5,
     alpha = 0.8,
@@ -474,8 +508,8 @@ TDS
 
 ```{r}
 TDS_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
-  geom_smooth(
-    aes(y = dd_savg_TDS, color = sampling_location),
+  geom_line(
+    aes(y = seas_mean_TDS, color = sampling_location),
     method = "loess",
     size = 0.5,
     alpha = 0.8,
@@ -491,45 +525,56 @@ TDS_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
 plot(TDS_dd_savgs)
 ```
 
-changing it to the other facet wrapping
+ch
 
 ```{r}
 # Plot scatter points and a line graph faceted by year
-ggplot(dd_seasonalavg_all, aes(x = year, y = dd_savg_EC, color = sampling_location)) +
+ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_temp, color = sampling_location)) +
   geom_line() +     # Adds the line graph
   labs(
-    title = "Marsh EC over time",
-    x = "Season and Year",
-    y = "EC"
+    title = "Marsh Temperature over time",
+    x = "Year",
+    y = "Temperature (C)"
   ) +
   theme_minimal()+
   facet_wrap(~season)
-
 #booty butt cheeks
+
+ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_temp, color = sampling_location)) +
+  geom_line() +     # Adds the line graph
+  labs(
+    title = "Marsh average Temperature over time",
+    x = "Year",
+    y = "Temperature (C)"
+  ) +
+  theme_minimal()+
+  facet_wrap(~sampling_location)
+
+#i think raw temperature needs to be graphed instead
 ```
 
 ```{r}
-ggplot(dd_seasonalavg_all, aes(x = year, y = dd_savg_EC, fill= sampling_location)) +
+ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC, fill= season)) +
   geom_col()+
-  facet_wrap(~season)
+  facet_wrap(~sampling_location)
 
 ```
 
-trying out new graph
+trying out new graph#
 
 ```{r}
 #summary table for EC 
-pond_summary <- water_data |> 
-  group_by(pond_id) %>%
-  summarize(
-    mean_ec = mean(conductivity, na.rm = TRUE),
-    sd_ec = sd(conductivity, na.rm = TRUE),
-    median_ec = median(conductivity, na.rm = TRUE),
-    iqr_ec = IQR(conductivity, na.rm = TRUE),
-    n_samples = n()
-  )
+#pond_summary <- water_data |> 
+  #group_by(pond_id) %>%
+  #summarize(
+    #mean_ec = mean(conductivity, na.rm = TRUE),
+    #sd_ec = sd(conductivity, na.rm = TRUE),
+    #median_ec = median(conductivity, na.rm = TRUE),
+    #iqr_ec = IQR(conductivity, na.rm = TRUE),
+    #n_samples = n()
+  #)
 
-print(pond_summary)
+#print(pond_summary)
 ```
 
 ```{r}
