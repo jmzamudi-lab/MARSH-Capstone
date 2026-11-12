@@ -1,0 +1,7 @@
+"0",""
+"0","# 1. Install and load the package (only need to install once)"
+"0","#library(writexl)"
+"0",""
+"0","# 2. Export your dataset"
+"0","# Replace 'my_data' with your dataframe, and name your file"
+"0","#write_xlsx(mwq_cleaner_data, ""mwq_cleaner_data.xlsx"")"

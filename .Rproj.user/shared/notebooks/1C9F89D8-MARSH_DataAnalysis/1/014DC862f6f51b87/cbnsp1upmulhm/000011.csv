@@ -1,4 +1,0 @@
-"0","devtools::install_github(""max-alletsee/rstudio-themes"")
-"
-"2","Error in loadNamespace(x) : there is no package called ‘devtools’
-"

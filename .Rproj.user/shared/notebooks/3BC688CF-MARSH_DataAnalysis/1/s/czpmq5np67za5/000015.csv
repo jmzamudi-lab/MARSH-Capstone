@@ -1,0 +1,8 @@
+"0",""
+"0","#horrible graph, actually awful"
+"0",""
+"0","#bar graph?"
+"0","ggplot(dd_syearavg_all, aes(x = season_year, y = seas_mean_EC)) +"
+"0","  geom_col( color = ""darkgray"", linewidth = 1)+"
+"0","  facet_wrap(~sampling_location)"
+"0",""

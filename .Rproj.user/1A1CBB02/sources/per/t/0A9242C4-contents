@@ -1,0 +1,79 @@
+---
+title: "Jeressicamiah"
+author: "Jeremiah and Jessica"
+format: html
+editor: visual
+---
+
+```{r}
+#install.packages("timeSeriesDataSets")
+library(tidyverse)
+library(timeSeriesDataSets)
+```
+
+## Plot 1 - Lake Huron
+
+The Lake Huron dataset contains water level data for Lake Huron, measured in feet, from NOAA.
+
+Sometimes we get time series data in a format we recognize:
+
+```{r}
+tidyLakeHuron <- tibble(LakeHuron, Year = c(1875:1972))
+tidyLakeHuron
+```
+
+And sometimes we get it in a specific ts format that is unique to time series data:
+
+```{r}
+class(LakeHuron_ts) 
+
+```
+
+## Task 1
+
+If you want to graph a ts object directly, you can do it with base R pretty quickly and easily.
+
+```{r}
+plot(LakeHuron_ts)
+```
+
+It's a little harder to do with ggplot, but not so bad if you converted the data to make it tidy like above. I've made a very, very bad graph of the Lake Huron data with ggplot. Fix it so it more appropriately shows the time series with a line graph.
+
+```{r}
+ggplot(tidyLakeHuron) + aes(x = LakeHuron, y = Year) + geom_count()
+```
+
+It's more annoying to do with ggplot.
+
+```{r}
+ggplot(tidyLakeHuron) + aes(x = LakeHuron, y = Year) + geom_line()
+```
+
+## Plot 2 - Nile water flow
+
+```{r}
+data(Nile_ts)
+```
+
+## Task 2
+
+I'm having trouble converting the Nile data into a tidy format. Can you fix it for me?
+
+```{r}
+Nile_ts_tidy<- tibble(height = Nile_ts , Year = seq(from = 1871, to = 1970, by = 1))
+tidyNile<- tibble( Nile_ts, Year = 1871:1970)
+tidyNile
+```
+
+## Task 3
+
+Graph the Nile data any way you like below.
+
+```{r}
+ggplot(Nile_ts_tidy) + aes(x = height, y = Year) + geom_line()
+plot(Nile_ts)
+```
+
+```{r}
+ggplot(tidyNile) + aes(x = Nile_ts, y = Year) + geom_count()
+```
