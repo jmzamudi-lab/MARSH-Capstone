@@ -1,0 +1,8 @@
+"0","#mean TDS: plot scatter points and a line graph "
+"0","ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS))+"
+"0","  geom_point(aes(color = sampling_location))+"
+"0","  geom_line(aes(color = sampling_location)) +   "
+"0","  labs("
+"0","    title = ""Mean TDS of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh"","
+"0","    x = ""Year"","
+"0","    y = ""Total Dissolved Solids (TDS) ppt"")"

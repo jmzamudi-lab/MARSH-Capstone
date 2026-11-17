@@ -396,7 +396,7 @@ ggplot(dd_pairsamp_avg_all,aes(x= season,y=mean_EC,colour=sampling_location))+
 
 ```
 
-##### Total Dissolved Solids (TDS) 
+##### Total Dissolved Solids (TDS)
 
 ###### Scatter Plots/Bar Graph
 
@@ -650,7 +650,6 @@ trying out new graph#
 DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
   geom_line(
     aes(y = seas_mean_DO, color = sampling_location),
-    method = "loess",
     size = 0.5,
     alpha = 0.8,
     se = FALSE
