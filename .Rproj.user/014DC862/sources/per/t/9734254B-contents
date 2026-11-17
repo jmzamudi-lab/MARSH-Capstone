@@ -313,7 +313,7 @@ dd_pairsamp_avg_all
 Averages per year
 
 ```{r}
-dd_pairsamp_avg_all |> 
+#dd_pairsamp_avg_all |> 
   
 
 ```
@@ -580,7 +580,7 @@ trying out new graph#
 ```{r}
 DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
   geom_line(
-    aes(y = dd_savg_DO, color = sampling_location),
+    aes(y = seas_mean_DO, color = sampling_location),
     method = "loess",
     size = 0.5,
     alpha = 0.8,
@@ -594,6 +594,14 @@ DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
   facet_wrap(~season)
 #getting closer but i still hate it
 plot(DO_dd_savgs)
+```
+
+```{r}
+ggplot(dd_seasonalavg_all,aes(x=season,y=seas_mean_EC,colour=sampling_location))+
+  geom_boxplot() +
+  facet_wrap(~year) +
+  theme(
+        axis.text.x = element_text(angle =90))
 ```
 
 #### Non-Dawn/Dusk Data
