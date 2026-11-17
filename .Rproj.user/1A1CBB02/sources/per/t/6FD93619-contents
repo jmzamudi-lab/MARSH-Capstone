@@ -350,6 +350,23 @@ ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +
 
 ```
 
+Scatter
+
+```{r}
+dd_ponds_avg_all<-
+  dd_pairsamp_avg_all |> 
+    #select(sampling_location == "pond_3", "pond_8", "pond_11")
+
+ggplot(dd_pairsamp_avg_all, aes(x = start_date, y = mean_EC))+
+  #geom_hline(yintercept=1.5,colour="red")+ #freshwater line
+  geom_point(aes(color = sampling_location))+
+  geom_line(aes(color = sampling_location)) +   
+  labs(
+    title = "Mean Electrical Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
+    x = "Year",
+    y = "Electrical Conductivity mS")
+```
+
 Mean Electric Conductivity of Dawn/Dusk/Dawn sample over each year per pond (geom_smooth)
 
 ```{r eval=FALSE}
@@ -599,6 +616,10 @@ ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC)) +
 
 ```
 
+```{r}
+
+```
+
 Time Series of seasonal avg
 
 EC
@@ -722,7 +743,7 @@ ggplot(dd_seasonalavg_all,aes(x=season,y=seas_mean_EC,colour=sampling_location))
 
 #### Data analysisNon-Dawn/Dusk Data
 
-```{r}
+```{r eval=FALSE}
 mwq_nondd_data
 
 
