@@ -233,7 +233,7 @@ mwq_cleaner_data
 
 #library(writexl)
 # 2. Export your dataset
-write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
+#write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
 ```
 
 ### Filtering Dawn/Dusk Data
@@ -301,7 +301,7 @@ dd_pairsamp_avg_all<-
     month %in% c(9, 10, 11) ~ "Fall"),
   year = year(start_date))
 
-write_xlsx(dd_pairsamp_avg_all, "dd_pairsamp_avg_all.xlsx")
+#write_xlsx(dd_pairsamp_avg_all, "dd_pairsamp_avg_all.xlsx")
 dd_pairsamp_avg_all
 ```
 
@@ -549,7 +549,7 @@ ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_DO)) +
 
 Calculating seasonal averages from raw Dawn/Dusk/Dawn samples (not the 2 day avgs)
 
-```{r}
+```{r eval= FALSE}
 pairsamp_dd_raw<-
 mwq_dd_data |> 
   mutate(date = as.Date(datetime)) |> 
@@ -583,7 +583,7 @@ dd_seasonalavg_all <-
 
 ##### Exploratory graphing
 
-```{r}
+```{r eval=FALSE}
 #raw data plot of EC over year and broken up by season
 ggplot(pairsamp_dd_raw, aes(x=year, y=EC_surface))+
   geom_point(aes(color=sampling_location))+
@@ -741,23 +741,15 @@ ggplot(dd_seasonalavg_all,aes(x=season,y=seas_mean_EC,colour=sampling_location))
 
 #### Data analysisNon-Dawn/Dusk Data
 
-```{r eval=FALSE}
+```{r eval= FALSE}
+
+#don't know how im going to average them, will double check later
 mwq_nondd_data
 
 
 #averages of the two days sampled 
 nondd_avg_all<-
   mwq_nondd_data |> 
-  mutate(date = as.Date(datetime), format = "%m/%d/%Y") |> 
-  filter(!is.na(date)) |> 
-  summarise( 
-    mean_EC = mean(EC_surface, na.rm = TRUE), 
-    mean_TDS = mean(TDS_surface, na.rm = TRUE),
-    mean_temp = mean(surface_temp, na.rm = TRUE),
-    mean_salinity = mean(salinity_surface, na.rm = TRUE),
-    mean_pH = mean(pH, na.rm = TRUE),
-    mean_DO = mean(DO_surface, na.rm = TRUE),
-    .groups = "drop" ) |> 
   mutate(
     month = month(datetime), 
     season = case_when(
@@ -765,9 +757,37 @@ nondd_avg_all<-
       month %in% c(3, 4, 5)  ~ "Spring",
       month %in% c(6, 7, 8)  ~ "Summer",
       month %in% c(9, 10, 11) ~ "Fall"),
-    year = year(datetime))
+    year = year(datetime)) |> 
+  group_by(sampling_location, season, year) |> 
+  filter(!is.na(datetime)) |> 
+  mutate(date = as.Date(datetime)) |> 
+  summarise( 
+    mean_EC = mean(EC_surface, na.rm = TRUE), 
+    mean_TDS = mean(TDS_surface, na.rm = TRUE),
+    mean_temp = mean(surface_temp, na.rm = TRUE),
+    mean_salinity = mean(salinity_surface, na.rm = TRUE),
+    mean_pH = mean(pH, na.rm = TRUE),
+    mean_DO = mean(DO_surface, na.rm = TRUE),
+    .groups = "drop" )
+
 
 nondd_avg_all
+```
+
+##### Visualizing NON-D/D/D samples
+
+```{r}
+#this needs to be fixed, drop SDC only look at winter and spring seperate upper, mid, lower marsh and ponds, include error bars/ look at how often they were sampled
+ggplot(nondd_avg_all, aes(x = year, y = mean_EC))+
+  geom_hline(yintercept=1.5,colour="red")+ #freshwater line
+  geom_point(aes(color = sampling_location))+
+  geom_line(aes(color = sampling_location)) +   
+  labs(
+    title = "Mean Electrical Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
+    x = "Year",
+    y = "Electrical Conductivity mS")+
+  facet_wrap(~season)
+
 ```
 
 geom line not smooth bc amy said so for time series

@@ -1,8 +1,0 @@
-"0",""
-"0",""
-"0","#bar graph?"
-"0","ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +"
-"0","  geom_col( aes(fill = sampling_location))+"
-"0","  geom_hline(yintercept=1.5,colour=""red"")+ #freshwater line"
-"0","    facet_wrap(~sampling_location)"
-"0",""

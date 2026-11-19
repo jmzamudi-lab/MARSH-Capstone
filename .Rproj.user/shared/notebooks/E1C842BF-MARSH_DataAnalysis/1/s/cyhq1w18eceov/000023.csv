@@ -1,0 +1,29 @@
+"0","#averages of the two days sampled 
+nondd_avg_all<-
+  mwq_nondd_data |> 
+  mutate(
+    month = month(datetime), 
+    season = case_when(
+      month %in% c(12, 1, 2) ~ ""Winter"",
+      month %in% c(3, 4, 5)  ~ ""Spring"",
+      month %in% c(6, 7, 8)  ~ ""Summer"",
+      month %in% c(9, 10, 11) ~ ""Fall""),
+    year = year(date)) |> 
+  group_by(season) |> 
+  filter(!is.na(date)) |> 
+  mutate(date = as.Date(datetime)) |> 
+  summarise( 
+    mean_EC = mean(EC_surface, na.rm = TRUE), 
+    mean_TDS = mean(TDS_surface, na.rm = TRUE),
+    mean_temp = mean(surface_temp, na.rm = TRUE),
+    mean_salinity = mean(salinity_surface, na.rm = TRUE),
+    mean_pH = mean(pH, na.rm = TRUE),
+    mean_DO = mean(DO_surface, na.rm = TRUE),
+    .groups = ""drop"" )
+"
+"1","[1m[33mError[39m in `mutate()`:[22m
+[38;5;251m[36mℹ[38;5;251m In argument: `year = year(date)`.[39m
+[1mCaused by error in `as.POSIXlt.default()`:[22m
+[33m![39m do not know how to convert 'x' to class “POSIXlt”
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"

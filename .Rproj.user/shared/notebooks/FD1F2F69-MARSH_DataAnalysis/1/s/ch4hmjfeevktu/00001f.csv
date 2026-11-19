@@ -1,4 +1,0 @@
-"0","#raw data plot of EC over year and broken up by season"
-"0","ggplot(pairsamp_dd_raw, aes(x=year, y=EC_surface))+"
-"0","  geom_point(aes(color=sampling_location))+"
-"0","  facet_wrap(~season)"
