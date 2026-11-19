@@ -231,12 +231,9 @@ mwq_cleaner_data<-
 
 mwq_cleaner_data
 
-# 1. Install and load the package (only need to install once)
 #library(writexl)
-
 # 2. Export your dataset
-# Replace 'my_data' with your dataframe, and name your file
-#write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
+write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
 ```
 
 ### Filtering Dawn/Dusk Data
@@ -304,6 +301,7 @@ dd_pairsamp_avg_all<-
     month %in% c(9, 10, 11) ~ "Fall"),
   year = year(start_date))
 
+write_xlsx(dd_pairsamp_avg_all, "dd_pairsamp_avg_all.xlsx")
 dd_pairsamp_avg_all
 ```
 
@@ -345,8 +343,26 @@ facet_wrap(~season)
 #bar graph?
 ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +
   geom_col( aes(fill = sampling_location))+
+  geom_hline(yintercept=1.5,colour="red")+ #freshwater line
     facet_wrap(~sampling_location)
 
+```
+
+Scatter
+
+```{r eval=FALSE}
+#dd_ponds_avg_all<-
+ # dd_pairsamp_avg_all |> 
+    #select(sampling_location == "pond_3", "pond_8", "pond_11")
+
+ggplot(dd_pairsamp_avg_all, aes(x = start_date, y = mean_EC))+
+  #geom_hline(yintercept=1.5,colour="red")+ #freshwater line
+  geom_point(aes(color = sampling_location))+
+  geom_line(aes(color = sampling_location)) +   
+  labs(
+    title = "Mean Electrical Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
+    x = "Year",
+    y = "Electrical Conductivity mS")
 ```
 
 Mean Electric Conductivity of Dawn/Dusk/Dawn sample over each year per pond (geom_smooth)
@@ -396,7 +412,7 @@ ggplot(dd_pairsamp_avg_all,aes(x= season,y=mean_EC,colour=sampling_location))+
 
 ```
 
-##### Total Dissolved Solids (TDS) 
+##### Total Dissolved Solids (TDS)
 
 ###### Scatter Plots/Bar Graph
 
@@ -405,6 +421,7 @@ Mean TDS of Dawn/Dusk/Dawn samples over each year per pond (scatter plots and ba
 ```{r}
 #mean TDS: plot scatter points and a line graph 
 ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS))+
+  geom_hline(yintercept=1,colour="red")+ #freshwater line
   geom_point(aes(color = sampling_location))+
   geom_line(aes(color = sampling_location)) +   
   labs(
@@ -415,7 +432,7 @@ ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS))+
 
 # Plot scatter points and a line graph separated by location
 ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS))+
-  geom_hline(yintercept=0.5,colour="red")+ #freshwater line
+  geom_hline(yintercept=1,colour="red")+ #freshwater line
   geom_point(aes(color = sampling_location))+
   geom_line(aes(color = sampling_location)) +  
   labs(
@@ -438,6 +455,7 @@ ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS))+
 #bar graph?
 ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_TDS)) +
   geom_col( aes(fill = sampling_location))+
+  geom_hline(yintercept=1,colour="red")+ #freshwater line
   facet_wrap(~sampling_location)
 ```
 
@@ -448,7 +466,7 @@ Mean TDS of Dawn/Dusk/Dawn samples over each season and year per pond
 ```{r}
 ggplot(dd_pairsamp_avg_all,aes(x= season,y=mean_TDS,colour=sampling_location))+
   geom_boxplot() +
-  geom_hline(yintercept=0.5,colour="red")+ #freshwater line
+  geom_hline(yintercept=1,colour="red")+ #freshwater line
   facet_wrap(~year)
 ```
 
@@ -486,7 +504,48 @@ TDS_dd_avgs <- ggplot(dd_pairsamp_avg_all, aes(x = start_date)) +
 plot(TDS_dd_avgs)
 ```
 
-#### Seasonal Averages
+##### Dissolved Oxygen (DO)
+
+###### Scatter Plots/Bar Graph
+
+Mean DO of Dawn/Dusk/Dawn samples over each year per pond (scatter plots and bar graph)
+
+```{r}
+#analyzing DO because Julie asked me to lol
+dd_pairsamp_avg_all
+#mean DO: plot scatter points and a line graph 
+
+ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_DO))+
+  geom_hline(yintercept=8,colour="red")+ #freshwater line
+  geom_point(aes(color = sampling_location))+
+  geom_line(aes(color = sampling_location)) +   
+  labs(
+    title = "Mean Dissolved Oxygen of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
+    x = "Year",
+    y = "Dissolved Oxygen mg/L")
+
+# Plot scatter points and a line graph separated by location
+ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_DO)) +
+  geom_hline(yintercept=8,colour="red")+ #freshwater line
+  geom_point(aes(color = sampling_location)) +   
+  geom_line(aes(color = sampling_location)) +   
+  labs(
+    title = "Mean Dissolved Oxygen of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
+    x = "Year",
+    y = "Dissolved Oxygen mg/L"
+  ) +
+  theme_minimal()+
+  facet_wrap(~season)
+
+
+#bar graph?
+ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_DO)) +
+  geom_col( aes(fill = sampling_location))+
+  geom_hline(yintercept=8,colour="red")+ #freshwater line
+  facet_wrap(~sampling_location)
+```
+
+#### Raw Seasonal Averages (not mean over 2 days)
 
 Calculating seasonal averages from raw Dawn/Dusk/Dawn samples (not the 2 day avgs)
 
@@ -525,6 +584,11 @@ dd_seasonalavg_all <-
 ##### Exploratory graphing
 
 ```{r}
+#raw data plot of EC over year and broken up by season
+ggplot(pairsamp_dd_raw, aes(x=year, y=EC_surface))+
+  geom_point(aes(color=sampling_location))+
+  facet_wrap(~season)
+  
 # Combine season and year with a space separator
 #dd_syearavg_all <- 
  # dd_seasonalavg_all |> 
@@ -533,6 +597,7 @@ dd_seasonalavg_all <-
 # Plot scatter points and a line graph faceted by year
 ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC))+
   geom_point(aes(color = sampling_location))+
+  geom_hline(yintercept=1.5,colour="red")+ #freshwater line
   geom_line(aes(color = sampling_location)) +   
   labs(
     title = "Mean Electrical Conductivity of Dawn/Dusk/Dawn Sampled Ponds in San Joaquin Marsh",
@@ -544,7 +609,12 @@ ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC))+
 #bar graph?
 ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC)) +
   geom_col(aes(fill = sampling_location))+
+  geom_hline(yintercept=1.5,colour="red")+ #freshwater line
   facet_wrap(~sampling_location)
+
+```
+
+```{r}
 
 ```
 
@@ -552,12 +622,11 @@ Time Series of seasonal avg
 
 EC
 
-```{r}
+```{r eval=FALSE}
 #EC
-EC_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
+EC_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year))+
   geom_line(
     aes(y = seas_mean_EC, color = sampling_location),
-    method = "loess",
     size = 0.5,
     alpha = 0.8,
     se = FALSE
@@ -575,7 +644,7 @@ plot(EC_dd_savgs)
 
 TDS
 
-```{r}
+```{r eval=FALSE}
 TDS_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
   geom_line(
     aes(y = seas_mean_TDS, color = sampling_location),
@@ -594,9 +663,7 @@ TDS_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
 plot(TDS_dd_savgs)
 ```
 
-ch
-
-```{r}
+```{r eval=FALSE}
 # Plot scatter points and a line graph faceted by year
 ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_temp, color = sampling_location)) +
   geom_line() +     # Adds the line graph
@@ -622,7 +689,7 @@ ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_temp, color = sampling_lo
 #i think raw temperature needs to be graphed instead
 ```
 
-```{r}
+```{r eval=FALSE}
 ggplot(dd_seasonalavg_all, aes(x = year, y = seas_mean_EC, fill= season)) +
   geom_col()+
   facet_wrap(~sampling_location)
@@ -646,11 +713,10 @@ trying out new graph#
 #print(pond_summary)
 ```
 
-```{r}
+```{r eval=FALSE}
 DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
   geom_line(
     aes(y = seas_mean_DO, color = sampling_location),
-    method = "loess",
     size = 0.5,
     alpha = 0.8,
     se = FALSE
@@ -665,7 +731,7 @@ DO_dd_savgs <- ggplot(dd_seasonalavg_all, aes(x = year) )+
 plot(DO_dd_savgs)
 ```
 
-```{r}
+```{r eval=FALSE}
 ggplot(dd_seasonalavg_all,aes(x=season,y=seas_mean_EC,colour=sampling_location))+
   geom_boxplot() +
   facet_wrap(~year) +
@@ -673,10 +739,35 @@ ggplot(dd_seasonalavg_all,aes(x=season,y=seas_mean_EC,colour=sampling_location))
         axis.text.x = element_text(angle =90))
 ```
 
-#### Non-Dawn/Dusk Data
+#### Data analysisNon-Dawn/Dusk Data
 
-```{r}
+```{r eval=FALSE}
 mwq_nondd_data
+
+
+#averages of the two days sampled 
+nondd_avg_all<-
+  mwq_nondd_data |> 
+  mutate(date = as.Date(datetime), format = "%m/%d/%Y") |> 
+  filter(!is.na(date)) |> 
+  summarise( 
+    mean_EC = mean(EC_surface, na.rm = TRUE), 
+    mean_TDS = mean(TDS_surface, na.rm = TRUE),
+    mean_temp = mean(surface_temp, na.rm = TRUE),
+    mean_salinity = mean(salinity_surface, na.rm = TRUE),
+    mean_pH = mean(pH, na.rm = TRUE),
+    mean_DO = mean(DO_surface, na.rm = TRUE),
+    .groups = "drop" ) |> 
+  mutate(
+    month = month(datetime), 
+    season = case_when(
+      month %in% c(12, 1, 2) ~ "Winter",
+      month %in% c(3, 4, 5)  ~ "Spring",
+      month %in% c(6, 7, 8)  ~ "Summer",
+      month %in% c(9, 10, 11) ~ "Fall"),
+    year = year(datetime))
+
+nondd_avg_all
 ```
 
 geom line not smooth bc amy said so for time series

@@ -1,0 +1,6 @@
+"0","# 2. Export your dataset
+write_xlsx(mwq_cleaner_data, ""mwq_cleaner_data.xlsx"")
+"
+"2","Error in write_xlsx(mwq_cleaner_data, ""mwq_cleaner_data.xlsx"") : 
+  could not find function ""write_xlsx""
+"

@@ -231,12 +231,9 @@ mwq_cleaner_data<-
 
 mwq_cleaner_data
 
-# 1. Install and load the package (only need to install once)
 #library(writexl)
-
 # 2. Export your dataset
-# Replace 'my_data' with your dataframe, and name your file
-#write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
+write_xlsx(mwq_cleaner_data, "mwq_cleaner_data.xlsx")
 ```
 
 ### Filtering Dawn/Dusk Data
@@ -304,6 +301,7 @@ dd_pairsamp_avg_all<-
     month %in% c(9, 10, 11) ~ "Fall"),
   year = year(start_date))
 
+write_xlsx(dd_pairsamp_avg_all, "dd_pairsamp_avg_all.xlsx")
 dd_pairsamp_avg_all
 ```
 
@@ -352,9 +350,9 @@ ggplot(dd_pairsamp_avg_all, aes(x = year, y = mean_EC)) +
 
 Scatter
 
-```{r}
-dd_ponds_avg_all<-
-  dd_pairsamp_avg_all |> 
+```{r eval=FALSE}
+#dd_ponds_avg_all<-
+ # dd_pairsamp_avg_all |> 
     #select(sampling_location == "pond_3", "pond_8", "pond_11")
 
 ggplot(dd_pairsamp_avg_all, aes(x = start_date, y = mean_EC))+
